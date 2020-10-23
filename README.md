@@ -34,7 +34,7 @@ $ npm run test:cov
 
 - [x] 错误处理 统一返回数据类型
 - [x] jwt 权限验证 路由守卫
-- [] 继承
+- [ ] 集成 swagger 文档
 
 ## Stay in touch
 

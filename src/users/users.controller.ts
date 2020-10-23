@@ -3,10 +3,11 @@ import { UsersService } from './users.service';
 import { UserDto } from './user.dto';
 import BaseResult from '@utils/BaseResult';
 import { makeSalt, encryptPassword } from '@utils/cypto';
+import { AuthService } from '@auth/auth.service';
 
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
 
   @Get()
   getUsers() {
@@ -19,10 +20,17 @@ export class UsersController {
     return this.usersService.findOneById(id);
   }
   @Post('/login')
-  async login(@Body('id') user: UserDto) {
+  async login(@Body() user: UserDto) {
     Logger.log(`用户${user.username}正在登录......`);
-
-    // return this.usersService.findOneById(id);
+    const authResult = await this.authService.validateUser(user.username, user.password);
+    switch (authResult.code) {
+      case 1:
+        return this.authService.certificate(authResult.user);
+      case 2:
+        return BaseResult.error(1000, `账号或密码不正确`);
+      default:
+        return BaseResult.error(1000, `该用户不存在`);
+    }
   }
 
   /**
